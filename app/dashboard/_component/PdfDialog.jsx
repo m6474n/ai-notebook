@@ -15,12 +15,13 @@ import { IoMdAdd } from "react-icons/io";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { useMutation } from "convex/react";
+import { useAction, useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { useState } from "react";
 import { AiOutlineLoading } from "react-icons/ai";
 import uuid4 from "uuid4";
 import { useUser } from "@clerk/nextjs";
+import axios from "axios";
 
 
 
@@ -28,6 +29,7 @@ export default  function PdfDialog() {
     const generateUploadUrl = useMutation(api.file_storage.generateUploadUrl) ;
     const  fileURL = useMutation(api.file_storage.getFileUrl);
     const insertFileToDB = useMutation(api.file_storage.AddFileToDB);
+    const embedDocument = useAction(api.myActions.ingest);
     const [fileName, setFileName] = useState();
     const { user } = useUser();
     const [file, setFile] = useState(null);
@@ -57,9 +59,17 @@ const onFileUpload =async ()=>{
         createdBy: user?.primaryEmailAddress?.emailAddress,
       
     })
-// console.log(user?.primaryEmailAddress?.emailAddress);
-    // console.log({fileId,fileName,storageId, });
+    // Split Pdf Text
+    const ApiResponse = await axios.get('/api/pdf-loader?pdfURL='+url);
+    console.log(ApiResponse.data.result);
     
+    // Embed Document Data using Google Generative AI and Store in database
+    embedDocument({
+        splittedText: ApiResponse.data.result,
+        fileId: fileId
+    });
+    
+
     setLoading(false);
 }
 
