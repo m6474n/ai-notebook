@@ -9,5 +9,12 @@ export default defineSchema({
     email: v.string(),
     imageUrl: v.string(),
 
+ }),
+ files:defineTable({
+    fileId:v.string(),
+    fileName:v.string(),
+    storageId:v.string(),
+    fileURL:v.string(),
+    createdBy:v.string(),
  })
 })

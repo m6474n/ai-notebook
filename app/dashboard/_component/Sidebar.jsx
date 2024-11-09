@@ -1,10 +1,10 @@
 import { Button } from '@/components/ui/button'
 import Image from 'next/image'
 import React from 'react'
-import { IoMdAdd } from "react-icons/io";
 import {  FaShieldAlt } from "react-icons/fa";
 import { BsLayoutTextSidebarReverse } from "react-icons/bs";
 import { Progress } from "@/components/ui/progress"
+import PdfDialog from './PdfDialog';
 
 
 
@@ -14,10 +14,7 @@ export default function Sidebar() {
       <Image src="./logo.svg" width={120} height={80} alt="Logo"/>
 
       <div className=" mt-12 space-y-5" >   
-        <Button className="w-full flex gap-1">
-        <IoMdAdd className="" />
-        Upload PDF
-        </Button>
+        <PdfDialog/>
         <Button variant="outline" className="w-full ">
           <BsLayoutTextSidebarReverse className=""/>  Workspace
         </Button>
