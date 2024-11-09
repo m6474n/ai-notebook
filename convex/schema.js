@@ -7,7 +7,7 @@ export default defineSchema({
     // column Name : value . dataType
     userName:v.string(),
     email: v.string(),
-    iimageUrl: v.string(),
+    imageUrl: v.string(),
 
  })
 })
