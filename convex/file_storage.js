@@ -1,4 +1,4 @@
-import { mutation } from "./_generated/server";
+import { mutation, query } from "./_generated/server";
 import { v } from "convex/values";  // Assuming you have `convex/values` for validation
 
 // Mutation to generate an upload URL
@@ -36,3 +36,13 @@ export const getFileUrl = mutation({
     return url; 
   },
 });
+
+export const GetFileRecord = query({
+  args:{
+    fileId:v.string(),
+  },handler:async(ctx,args)=>{
+   const result= await ctx.db.query('files').filter((q)=>q.eq(q.field('fileId'), args.fileId)).collect();
+    console.log(result);
+    return result[0];
+  }
+})
