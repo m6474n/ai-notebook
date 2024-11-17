@@ -23,8 +23,9 @@ import { AiOutlineLoading } from "react-icons/ai";
 import uuid4 from "uuid4";
 import { useUser } from "@clerk/nextjs";
 import axios from "axios";
+import { toast } from "sonner";
 
-export default function PdfDialog() {
+export default function PdfDialog({isMax}) {
   const [open, setOpen] = useState(false);
   const fileURL = useMutation(api.file_storage.getFileUrl);
 
@@ -70,13 +71,15 @@ export default function PdfDialog() {
 
     setLoading(false);
     setOpen(false);
+    toast("File is ready!")
   };
 
   return (
-    <Dialog open={open}>
-      <DialogTrigger asChild>
+    <Dialog open={open} >
+      <DialogTrigger asChild disabled={isMax}>
         <Button
           className="w-full flex gap-1"
+        
           onClick={() => {
             setOpen(true);
           }}
@@ -120,7 +123,7 @@ export default function PdfDialog() {
 
         <DialogFooter className="sm:justify-end">
           <DialogClose asChild>
-            <Button type="button" variant="secondary">
+            <Button type="button" variant="secondary" onClick={()=>setOpen(false)}>
               Close
             </Button>
           </DialogClose>

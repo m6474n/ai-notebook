@@ -46,3 +46,21 @@ export const GetFileRecord = query({
     return result[0];
   }
 })
+
+export const getUserFiles = query({
+  args:{
+    createdBy: v.optional(v.string()),
+  },handler:async(ctx, args)=>{
+
+    if(!args?.createdBy){
+      return ;
+    }
+
+    const result = await ctx.db
+    .query("files")
+    .filter((q) => q.eq(q.field("createdBy"), args.createdBy))
+    .collect();
+    return result;
+ 
+  }
+})
