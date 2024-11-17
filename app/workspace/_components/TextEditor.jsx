@@ -21,11 +21,15 @@ import ts from "highlight.js/lib/languages/typescript";
 import html from "highlight.js/lib/languages/xml";
 import Strike from "@tiptap/extension-strike";
 import { TextSelection } from "prosemirror-state";
+import { toast } from "sonner"
+
 
 import EditorExtensions from "./EditorExtensions";
-import { useAction } from "convex/react";
+import { useAction, useMutation, useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { chatSession } from "@/config/AiModel";
+import { useUser } from "@clerk/nextjs";
+import { useEffect } from "react";
 const lowlight = createLowlight(all);
 
 lowlight.register("html", html);
@@ -34,13 +38,13 @@ lowlight.register("js", js);
 lowlight.register("ts", ts);
 const TextEditor = ({ fileId }) => {
   const SearchAi = useAction(api.myActions.search);
+  const saveNotes = useMutation(api.notes.AddNotes);
+  const notes = useQuery(api.notes.GetNotes,{fileId:fileId});
+  const user = useUser()
+  console.log(notes)
+
   const onAiClick = async () => {
-    // const selectedText = editor.state.doc.tex tBetween(
-    //   editor.state.selection.from,
-    //   editor.state.selection.to,
-    //   ' '
-    // );
-    console.log(fileId);
+    toast("Fetching your answer....")
     const res = await SearchAi({ query: selectedText, fileId });
     let unformatted = JSON.parse(res);
     let unFormattedAnswer = "";
@@ -60,19 +64,23 @@ const TextEditor = ({ fileId }) => {
     const AIGeneratedAnswer = await chatSession.sendMessage(PROMPT);
 
     console.log(AIGeneratedAnswer.response.text());
-    const finalResult = AIGeneratedAnswer.response.text().replace('```',"").replace("html","").replace('```',"");
-    // Filter the answer from result
-    // const match = finalResult.match(/<p>(.*?)<\/p>/);
-    // let finalAns = "";
-    // if (match && match[1]) {
-    //   finalAns = match[1];
-    //   console.log(finalAns); // This will log the text between <p></p> tags
-    // } else {
-    //   console.log("No <p> tags found");
-    // }
-// Write answer on screen
+    const finalResult = AIGeneratedAnswer.response
+      .text()
+      .replace("```", "")
+      .replace("html", "")
+      .replace("```", "");
+
+    const bodyMatch = finalResult.match(/<body[^>]*>([\s\S]*?)<\/body>/);
+    let bodyContent = bodyMatch ? bodyMatch[1].trim() : ""; // Extracting content inside <body>
+
+    console.log("Extracted Body Content:", bodyContent);
     const text = editor.getHTML();
-    editor.commands.setContent(text+'<p><strong>Answer:</strong>'+finalResult +'</p>')
+    editor.commands.setContent(
+      text + "<p><strong>Result:</strong>" + bodyContent + "</p>"
+    );
+    console.log("user is : "+user.user.primaryEmailAddress?.emailAddress);
+    const creator = user.user.primaryEmailAddress?.emailAddress;
+    saveNotes({fileId:fileId, createdBy:creator,notes:editor.getHTML()})
   };
   let selectedText = "";
   const editor = useEditor({
@@ -121,10 +129,23 @@ const TextEditor = ({ fileId }) => {
     },
   });
 
+
+
+
+useEffect(()=>{
+  editor&&editor.commands.setContent(notes);
+},[editor&&notes])
+
   return (
     <div>
-      <EditorExtensions editor={editor} selectedText={selectedText} />
-      <EditorContent editor={editor} />
+      <EditorExtensions
+        editor={editor}
+        selectedText={selectedText}
+        fileId={fileId}
+      />
+      <div className="overflow-scroll h-[86vh]">
+        <EditorContent editor={editor} />
+      </div>{" "}
     </div>
   );
 };

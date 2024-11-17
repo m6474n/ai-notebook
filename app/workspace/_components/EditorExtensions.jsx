@@ -1,4 +1,8 @@
+import { chatSession } from "@/config/AiModel";
+import { api } from "@/convex/_generated/api";
 import { cn } from "@/lib/utils";
+import { useUser } from "@clerk/nextjs";
+import { useAction, useMutation } from "convex/react";
 
 import {
   AlignCenter,
@@ -16,18 +20,58 @@ import {
   Underline,
 } from "lucide-react";
 import React from "react";
+import { toast } from "sonner"
 
-export default function EditorExtensions({ editor, selectedText }) {
-  const onAiClick = async () => {
-    // const selectedText = editor.state.doc.textBetween(
-    //   editor.state.selection.from,
-    //   editor.state.selection.to,  
-    //   ' '
-    // );
-    console.log(selectedText);
-    
-    // console.log(selectedText);
-  };
+
+
+export default function EditorExtensions({ editor, fileId }) {
+const user = useUser();
+const saveNotes = useMutation(api.notes.AddNotes);
+const SearchAi = useAction(api.myActions.search);
+const AiClick = async () => {
+  toast("Fetching your answer....")
+  const selectedText = editor.state.doc.textBetween(
+    editor.state.selection.from,
+    editor.state.selection.to,
+    ' '
+  );
+  console.log(selectedText);
+  const res = await SearchAi({ query: selectedText, fileId });
+  let unformatted = JSON.parse(res);
+  let unFormattedAnswer = "";
+  unformatted &&
+    unformatted.forEach(
+      (item) => (unFormattedAnswer = unFormattedAnswer + item.pageContent)
+    );
+
+  console.log("Unstructured Response" + unFormattedAnswer);
+
+  const PROMPT =
+    "For the given question: " +
+    selectedText +
+    "and with the given content as answer, please give me appropriate answer in HTML format. The answer content is " +
+    unFormattedAnswer;
+
+  const AIGeneratedAnswer = await chatSession.sendMessage(PROMPT);
+
+  console.log(AIGeneratedAnswer.response.text());
+  let finalResult = AIGeneratedAnswer.response.text().replace('```', '').replace("html", "").replace('```', "");
+
+  const bodyMatch = finalResult.match(/<body[^>]*>([\s\S]*?)<\/body>/);
+  let bodyContent = bodyMatch ? bodyMatch[1].trim() : ''; // Extracting content inside <body>
+
+  console.log("Extracted Body Content:", bodyContent);
+  const text = editor.getHTML();
+  editor.commands.setContent(text + '<p><strong>Result:</strong>' + bodyContent + '</p>');
+const creator = user?.user?.primaryEmailAddress?.emailAddress
+    saveNotes({
+      fileId: fileId,
+      notes: editor.getHTML(),
+      createdBy: creator
+    })
+
+};
+
 
   return (
     <div className="flex flex-row justify-start items-center p-4 gap-1 border-b-slate-200 border-b">
@@ -192,7 +236,7 @@ export default function EditorExtensions({ editor, selectedText }) {
         <List />
       </button>
       <button
-        onClick={() => onAiClick()}
+        onClick={() => AiClick()}
         className={cn("p-1 border border-transparent hover:text-blue-500")}
       >
         <Sparkles />
