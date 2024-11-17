@@ -15,9 +15,8 @@ import React, { useState } from 'react';
 export default function PDFViewer({ fileId }) {
   const [isLoading, setIsLoading] = useState(true);
 
-  // Handle the PDF loading event
   const handleIframeLoad = () => {
-    setIsLoading(false); // Set loading to false when the iframe is loaded
+    setIsLoading(false); 
   };
 
   return (

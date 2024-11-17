@@ -23,10 +23,13 @@ export const AddNotes = mutation({
 
 export const GetNotes = query({
     args:{
-        fileId:v.string()
+        fileId:v.optional(v.string())
     },
     handler:async(ctx,args)=>{
+        if(!args?.fileId){
+            return ;
+        }
         const result =  await ctx.db.query('notes').filter((e)=>e.eq(e.field('fileId'),args.fileId)).collect();
-        return result[0].notes
+        return result[0]?.notes
     }
 })
