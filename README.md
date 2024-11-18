@@ -1,6 +1,6 @@
 
 <a href="https://m6474n.github.io/">
-  <img alt="AI Powered - Notes Taking App with Convex Backend and Gemini " src="[https://raw.githubusercontent.com/m6474n/next-blog/refs/heads/master/public/cover.png](https://raw.githubusercontent.com/m6474n/next-blog/refs/heads/master/public/cover.png](https://raw.githubusercontent.com/m6474n/ai-notebook/refs/heads/main/public/banner.png?token=GHSAT0AAAAAACXGTDVSRDYS7FQTDT77YH66ZZ3RYIA)">
+  <img alt="AI Powered - Notes Taking App with Convex Backend and Gemini " src="https://raw.githubusercontent.com/m6474n/ai-notebook/refs/heads/main/public/banner.png?token=GHSAT0AAAAAACXGTDVSRDYS7FQTDT77YH66ZZ3RYIA">
   <h1 align="center">AI Powered - Notes Taking App with Convex Backend and Gemini </h1>
 </a>
 
