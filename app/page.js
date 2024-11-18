@@ -1,4 +1,6 @@
 "use client";
+import Hero from "@/components/Hero";
+import MainHeader from "@/components/MainHeader";
 import { Button } from "@/components/ui/button";
 import { api } from "@/convex/_generated/api";
 import { UserButton, useUser } from "@clerk/nextjs";
@@ -24,12 +26,15 @@ export default function Home() {
   }, [user]);
 
   return (
+   
     <div>
-      Hellow worlds...
+       
+       <Hero/>
+      {/* Hellow worlds...
       <Button>Click me !</Button>
       <div>
         <UserButton />
-      </div>
+      </div> */}
     </div>
   );
 }
