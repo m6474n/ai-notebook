@@ -10,28 +10,35 @@ import PdfDialog from './PdfDialog';
 import { useUser } from '@clerk/nextjs';
 import { useQuery } from 'convex/react';
 import { api } from '@/convex/_generated/api';
+import { usePathname } from 'next/navigation';
+import Link from 'next/link';
 
 
 
 
 export default function Sidebar() {
+  const path  = usePathname()
+  console.log(path == "/dashboard")
   const user = useUser();
   const files = useQuery(api.file_storage.getUserFiles, {
     createdBy: user.user?.primaryEmailAddress?.emailAddress,
   });
   return (
     <div className="shadow-md h-screen p-7" >
-      <Image src="./logo.svg" width={120} height={80} alt="Logo"/>
+     <Link href={"/"}> <Image src="./logo.svg" width={120} height={80} alt="Logo"/></Link>
 
-      <div className=" mt-12 space-y-5" >   
+      <div className=" flex flex-col  gap-2 mt-12" >   
         <PdfDialog isMax={files?.length>=5?true:false}/>
-        <Button variant="outline" className="w-full ">
+       <Link href={`/dashboard`}>
+       
+       <Button variant="outline" className={`w-full ${path == "/dashboard"&&"bg-slate-100"}`}>
           <BsLayoutTextSidebarReverse className=""/>  Workspace
-        </Button>
-        <Button variant="outline" className="w-full">
+        </Button></Link>
+       <Link href={'/dashboard/upgrade'}>
+       <Button variant="outline"className={`w-full ${path == "/dashboard/upgrade"&&"bg-slate-100"}`}>
            <FaShieldAlt/> Upgrade 
         </Button>
-       
+       </Link>
       </div>
     <div className="absolute bottom-20 w-[75%]">
     <div className="flex flex-col items-center justify-center space-y-3">
